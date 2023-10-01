@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <style>
+		body {
+			background-color: rgba(128, 128, 128, 0.726);
+		}
+        input {
+            font: 2em sans-serif;
+            text-align: center;
+            height: 1.5em;
+            max-width: 477px;
+            --c:  #000;
+            box-shadow: 0 0 0 .3px;
+        }
+		input.inputField {
+			pointer-events: none;
+		}
+        input:focus {
+            --c:  #000; /* the color*/
+  
+            box-shadow: 0 0 0 .1em inset var(--c); 
+        }
+        input.input_xy {
+            font: 2em sans-serif;
+            width: 2.72em;
+            height: 1.32em;
+            float: left;
+			border-radius: 30px;
+			box-shadow: none;
+        }
+        input.input_xy:hover {
+            box-shadow: 0px 10px 20px 5px inset #FFBF00;
+        }
+        button {
+            font: 2em sans-serif;
+            width: 3em;
+            height: 1.5em;
+            float: left;
+			margin-left: 1px;
+            /*got from the internet https://codepen.io/t_afif/pen/abKyJNJ*/
+
+            --c:  #000; /* the color*/
+			box-shadow: 0 0 0 .3px;
+			border-color:#000;
+            /* box-shadow: 0 0 0 .1em inset var(--c);  */
+            /* --_g: linear-gradient(var(--c) 0 0) no-repeat;
+            background: 
+                var(--_g) calc(var(--_p,0%) - 100%) 0%,
+                var(--_g) calc(200% - var(--_p,0%)) 0%,
+                var(--_g) calc(var(--_p,0%) - 100%) 100%,
+                var(--_g) calc(200% - var(--_p,0%)) 100%;
+            background-size: 50.5% calc(var(--_p,0%)/2 + .5%); */
+            outline-offset: .1em;
+            transition: background-size .4s, background-position 0s .4s;
+        }
+        button:hover {
+            --_p: 100%;
+            transition: background-position .4s, background-size 0s;
+            color:#fff;
+            /* transform: translateY(-5px); */
+        }
+        button:active {
+        box-shadow: 0 0 9e9q inset #001000;
+        /* background-color: var(--c); */
+        color: #fff;
+}
+        label {
+            width: 6em;
+            height: 1.5em;
+            font: sans-serif;
+            float: left;
+            vertical-align: text-bottom;
+            text-align: center;
+        }
+    </style>
+</head>
+<body style="margin-left: 30px;">
+    <in>
+        <input id="inputField" class="inputField" type="text" maxlength="256" placeholder="press buttons" value="" size=30></input>
+    </in>
+    <p>
+        <button id="button_plus" class="simple_buttons" value=" + ">+</button>
+		<button id="button_unary_minus" class="simple_buttons" value=" unary_minus ">-x</button>
+        <button id="button_unary_plus" class="simple_buttons" value=" unary_plus ">+x</button>
+		<button id="button_x" class="simple_buttons" value=" X ">x</button>
+        <button id="button_multiply" class="simple_buttons" value=" * ">*</button>
+    </p>
+    <br></br>
+    <p>
+        <button id="button_minus" class="simple_buttons" value=" - ">-</button>
+		<button id="button_sin" class="simple_buttons" value=" sin ">sin</button>
+        <button id="button_cos" class="simple_buttons" value=" cos ">cos</button>
+		<button id="button_tan" class="simple_buttons" value=" tan ">tan</button>
+        <button id="button_divide" class="simple_buttons" value=" / ">/</button>
+    </p>
+    <br></br>
+    <p>
+        <button id="button_left_bracket" class="simple_buttons" style="padding-bottom: 0.2em;" value=" ( ">(</button>
+		<button id="button_asin" class="simple_buttons" value=" asin ">asin</button>
+        <button id="button_acos" class="simple_buttons" value=" acos ">acos</button>
+		<button id="button_atan" class="simple_buttons" value=" atan ">atan</button>
+        <button id="button_power" class="simple_buttons" value=" ^ ">^</button>
+    </p>
+    <br></br>
+	<p>
+		<button id="button_right_bracket" class="simple_buttons" style="padding-bottom: 0.2em;" value=" ) ">)</button>
+		<button id="button_sqrt" class="simple_buttons" value=" sqrt ">sqrt</button>
+        <button id="button_ln" class="simple_buttons" value=" ln ">ln</button>
+		<button id="button_log" class="simple_buttons" value=" log ">log</button>
+        <button id="button_mod" class="simple_buttons" value=" mod ">mod</button>
+	</p>
+	<br></br>
+    <p>
+        <button style="visibility: hidden; color: transparent;" class="simple_buttons"></button>
+		<button id="button1" class="simple_buttons" value="1">1</button>
+        <button id="button2" class="simple_buttons" value="2">2</button>
+        <button id="button3" class="simple_buttons" value="3">3</button>
+    </p>
+    <br></br>
+    <p>
+        <button style="visibility: hidden; color: transparent;" class="simple_buttons"></button>
+		<button id="button4" class="simple_buttons" value="4">4</button>
+        <button id="button5" class="simple_buttons" value="5">5</button>
+		<button id="button6" class="simple_buttons" value="6">6</button>
+    </p>
+    <br></br>
+    <p>
+        <label><br>x,y(min, max)</label>
+        <button id="button7" class="simple_buttons" value="7">7</button>
+        <button id="button8" class="simple_buttons" value="8">8</button>
+		<button id="button9" class="simple_buttons" value="9">9</button>
+    </p>
+    <br></br>
+    <p>
+        <input id="input_min" type="text" placeholder="0" class="input_xy"></input>
+        <button id="button_clear" class="simple_buttons" value="clear">AC</button>
+		<button id="button0" class="simple_buttons" value="0">0</button>
+        <button id="button_equals" class="simple_buttons" value="=">=</button>
+		<button id="button_help" class="simple_buttons" value="help">help</button>
+    </p>
+    <br></br>
+    <p>
+        <input id="input_max" type="text" placeholder="0" class="input_xy"></input>
+        <label style="font-size: 2em; width: 3.1em; margin-top: 0.1em; height: 1.2em;">X=</label><input id="input_x_value" type="text" placeholder="0" value="0" class="input_xy"></input>
+        <button id="button_dot" class="simple_buttons" value=".">.</button>
+		<button id="button_graph" class="simple_buttons" value="graph">graph</button>
+    </p>
+    <br></br>
+    <p>
+        <label style="max-width: 5.9em;"><br>history</label>
+        <button id="button_last" class="simple_buttons" value="last">last</button>
+        <button id="button_prev" class="simple_buttons" value="prev">prev</button>
+		<button id="button_next" class="simple_buttons" value="next">next</button>
+		<button id="button_history_clear" class="simple_buttons" value="history_clear">clear</button>
+    </p>
+<script src="./jsScript/index.js"></script>
+<!-- <script src="./jsScript/renderer.js"></script> -->
+</body>
+</html>
