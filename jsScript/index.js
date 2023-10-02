@@ -16,22 +16,27 @@ xyMax.addEventListener('change', () => {
 	sendRequest('xy_max= ' + xyMax.value)
 })
 
-// xyMin.addEventListener('change', () => {
-// 	astilectron.sendMessage('xy_min= ' + xyMin.value)
-// })
+xyMin.addEventListener('change', () => {
+	sendRequest('xy_min= ' + xyMin.value)
+})
 
-// var clickFunction = function() {
-// 	if (this.getAttribute('id') === 'button_equals') {
-// 		astilectron.sendMessage('x= ' + xInput.value)
-// 	} else if (this.getAttribute('id') === 'button_graph') {
-// 		console.log(xyMax.value, xyMin.value)
-// 	}
-// 	astilectron.sendMessage(this.getAttribute('value'))
-// }
+var clickFunction = function() {
+	if (this.getAttribute('id') === 'button_equals') {
+		sendRequest('x= ' + xInput.value)
+	} else if (this.getAttribute('id') === 'button_graph') {
+		console.log(xyMax.value, xyMin.value)
+	} else if (this.getAttribute('value') === 'clear') {
+		mainEntry.setAttribute('value', '')
+	}
+	else {
+		mainEntry.setAttribute('value',mainEntry.getAttribute('value') + this.getAttribute('value'))
+	}
+	sendRequest(this.getAttribute('value'))
+}
 
-// for (var i = 0; i < buttons.length; i++) {
-// 	buttons[i].addEventListener('click', clickFunction)
-// }
+for (var i = 0; i < buttons.length; i++) {
+	buttons[i].addEventListener('click', clickFunction)
+}
 
 
 

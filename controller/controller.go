@@ -11,10 +11,10 @@ import (
 )
 
 type Controller struct {
-	expression,
-	expressionBack,
+	Expression,
+	ExpressionBack,
 	postfixExpression,
-	lastResult,
+	LastResult,
 	currentDir string
 	priorities             map[string]int
 	history                map[int64]string
@@ -25,22 +25,22 @@ type Controller struct {
 
 func (c *Controller) HandleMessage(message string) {
 	if message == " unary_minus " {
-		c.expression += message
-		c.expressionBack += "-"
+		c.Expression += message
+		c.ExpressionBack += "-"
 	} else if message == " unary_plus " {
-		c.expression += message
-		c.expressionBack += "+"
+		c.Expression += message
+		c.ExpressionBack += "+"
 	} else if message == " sin " || message == " cos " || message == " tan " ||
 		message == " asin " || message == " acos " || message == " atan " ||
 		message == " ln " || message == " log " || message == " sqrt " || message == " mod " {
-		c.expression += message + " ( "
-		c.expressionBack += strings.TrimSuffix(message, " ") + "( "
+		c.Expression += message + " ( "
+		c.ExpressionBack += strings.TrimSuffix(message, " ") + "( "
 	} else if message == "clear" {
-		c.expression = ""
-		c.expressionBack = ""
+		c.Expression = ""
+		c.ExpressionBack = ""
 	} else {
-		c.expression += message
-		c.expressionBack += message
+		c.Expression += message
+		c.ExpressionBack += message
 	}
 }
 
@@ -50,27 +50,27 @@ func (c *Controller) HandleHistory(message string) {
 		lh := int64(len(history))
 		if lh != 0 {
 			c.currentHistoryPosition = lh
-			c.expressionBack = strings.ReplaceAll(history[lh], "unary_plus", "+")
-			c.expressionBack = strings.ReplaceAll(history[lh], "unary_minus", "-")
-			c.expression = history[lh]
+			c.ExpressionBack = strings.ReplaceAll(history[lh], "unary_plus", "+")
+			c.ExpressionBack = strings.ReplaceAll(history[lh], "unary_minus", "-")
+			c.Expression = history[lh]
 		}
 	} else if message == "prev" {
 		history := c.history
 		lh := int64(len(history))
 		if lh != 0 && c.currentHistoryPosition != 0 {
 			c.currentHistoryPosition -= 1
-			c.expressionBack = strings.ReplaceAll(history[c.currentHistoryPosition], "unary_plus", "+")
-			c.expressionBack = strings.ReplaceAll(history[c.currentHistoryPosition], "unary_minus", "-")
-			c.expression = history[c.currentHistoryPosition]
+			c.ExpressionBack = strings.ReplaceAll(history[c.currentHistoryPosition], "unary_plus", "+")
+			c.ExpressionBack = strings.ReplaceAll(history[c.currentHistoryPosition], "unary_minus", "-")
+			c.Expression = history[c.currentHistoryPosition]
 		}
 	} else if message == "next" {
 		history := c.history
 		lh := int64(len(history))
 		if lh != 0 && c.currentHistoryPosition != int64(len(history)) {
 			c.currentHistoryPosition += 1
-			c.expressionBack = strings.ReplaceAll(history[c.currentHistoryPosition], "unary_plus", "+")
-			c.expressionBack = strings.ReplaceAll(history[c.currentHistoryPosition], "unary_minus", "-")
-			c.expression = history[c.currentHistoryPosition]
+			c.ExpressionBack = strings.ReplaceAll(history[c.currentHistoryPosition], "unary_plus", "+")
+			c.ExpressionBack = strings.ReplaceAll(history[c.currentHistoryPosition], "unary_minus", "-")
+			c.Expression = history[c.currentHistoryPosition]
 		}
 	} else if message == "history_clear" {
 		c.logFile.Truncate(0)
@@ -79,8 +79,16 @@ func (c *Controller) HandleHistory(message string) {
 		}
 	}
 }
-
-func openLogFile(string) (*os.File, error) { return nil, nil }
+func openLogFile(currentDir string) (*os.File, error) {
+	file, err := os.OpenFile(currentDir+"/calc_log", os.O_APPEND|os.O_RDWR, os.ModeAppend)
+	if err != nil {
+		file, err = os.Create("calc_log")
+		if err != nil {
+			return nil, err
+		}
+	}
+	return file, nil
+}
 
 func (c *Controller) Init() {
 	c.fillPriorities()
@@ -107,7 +115,7 @@ func (c *Controller) readHistory() {
 }
 
 func (c *Controller) writeLog(expression string) {
-	if c.lastResult != "error" {
+	if c.LastResult != "error" {
 		var err error
 		result := strconv.FormatFloat(float64(len(c.history)+1), 'G', 30, 64) + " " + expression + "\n"
 		_, err = c.logFile.Write([]byte(result))
@@ -119,16 +127,16 @@ func (c *Controller) writeLog(expression string) {
 	}
 }
 
-func (c *Controller) invokeModel(expression string) {
+func (c *Controller) InvokeModel() {
 	var m Model.Model
-	c.postfixExpression, _ = c.infixToPostfix(strings.Fields(c.expression))
+	c.postfixExpression, _ = c.infixToPostfix(strings.Fields(c.Expression))
 	m.PostfixExpression = c.postfixExpression
 	if !m.StartComputeRPN() {
-		c.lastResult = "error"
+		c.LastResult = "error"
 	} else {
-		c.lastResult = strconv.FormatFloat(m.Result, 'f', -1, 64)
+		c.LastResult = strconv.FormatFloat(m.Result, 'f', -1, 64)
 	}
-	c.writeLog(expression)
+	c.writeLog(c.Expression)
 }
 
 func (c *Controller) invokeGraphic(xMin, xMax, yMin, yMax float64) (string, error) {
