@@ -10,7 +10,7 @@ import (
 func main() {
 	router := gin.New()
 
-	router.LoadHTMLFiles("index.html")
+	router.LoadHTMLFiles("index.html", "help.html", "graph_window.html")
 	router.StaticFile("./jsScript/index.js", "jsScript/index.js")
 	router.GET("/index.html", func(ctx *gin.Context) {
 		ctx.HTML(http.StatusOK, "index.html", nil)
