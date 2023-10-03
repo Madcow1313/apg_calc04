@@ -51,7 +51,7 @@ func (d *Drawer) Draw() (string, error) {
 	p.Y.Min = d.YMin
 	p.Y.Max = d.YMax
 	p.Add(ps)
-	err := p.Save(720, 480, d.CurrentDir+"/test.png")
+	err := p.Save(720, 480, "test.png")
 	if err != nil {
 		fmt.Printf("%v", err)
 		return "", err

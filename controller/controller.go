@@ -20,7 +20,7 @@ type Controller struct {
 	history                map[int64]string
 	currentHistoryPosition int64
 	logFile                *os.File
-	xMax, xMin             float64
+	XMax, XMin             float64
 }
 
 func (c *Controller) HandleMessage(message string) {
@@ -33,7 +33,7 @@ func (c *Controller) HandleMessage(message string) {
 	} else if message == " sin " || message == " cos " || message == " tan " ||
 		message == " asin " || message == " acos " || message == " atan " ||
 		message == " ln " || message == " log " || message == " sqrt " || message == " mod " {
-		c.Expression += message + " ( "
+		c.Expression += message
 		c.ExpressionBack += strings.TrimSuffix(message, " ") + "( "
 	} else if message == "clear" {
 		c.Expression = ""
@@ -139,11 +139,11 @@ func (c *Controller) InvokeModel() {
 	c.writeLog(c.Expression)
 }
 
-func (c *Controller) invokeGraphic(xMin, xMax, yMin, yMax float64) (string, error) {
+func (c *Controller) InvokeGraphic(xMin, xMax, yMin, yMax float64) (string, error) {
 	var d Drawer.Drawer
 
 	d.XMax, d.XMin, d.YMin, d.YMax = xMax, xMin, yMin, yMax
-	d.PostfixExpression = c.postfixExpression
+	d.PostfixExpression, _ = c.infixToPostfix(strings.Fields(c.Expression))
 	d.CurrentDir = c.currentDir
 	fileName, err := d.Draw()
 
