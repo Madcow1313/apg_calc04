@@ -53,7 +53,7 @@ func main() {
 		} else {
 			Controller.HandleMessage(q)
 		}
-		fmt.Println(Controller.Expression)
+		fmt.Println("",Controller.Expression)
 		ctx.HTML(http.StatusOK, "index.html", gin.H{
 			"result": Controller.LastResult,
 		})
