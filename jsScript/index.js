@@ -26,7 +26,8 @@ var clickFunction = function() {
 		// sendRequest(this.getAttribute('value'), 'GET', 'http://localhost:8080/help.html')
 		location.href = 'help.html'
 	} else if (this.getAttribute('id') === 'button_graph') {
-		location.href = 'graph_window.html'
+		// location.href = 'graph_window.html'
+		window.open('graph_window.html')
 	} else {
 		mainEntry.setAttribute('value',mainEntry.getAttribute('value') + this.getAttribute('value'))
 		sendRequest(this.getAttribute('value'))
@@ -37,11 +38,11 @@ for (var i = 0; i < buttons.length; i++) {
 	buttons[i].addEventListener('click', clickFunction)
 }
 
-xyMin.addEventListener('change', () => {
+xyMin.addEventListener('focus', () => {
 	sendRequest('xy_min= ' + xyMin.value)
 })
 
-xyMax.addEventListener('change', () => {
+xyMax.addEventListener('focus', () => {
 	sendRequest('xy_max= ' + xyMax.value)
 })
 

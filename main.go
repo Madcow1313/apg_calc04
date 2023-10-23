@@ -19,6 +19,8 @@ func main() {
 	router.StaticFile("./jsScript/index.js", "jsScript/index.js")
 	router.StaticFile("./test.png", "test.png")
 	router.GET("/", func(ctx *gin.Context) {
+		Controller.Expression = ""
+		Controller.LastResult = ""
 		ctx.HTML(http.StatusOK, "index.html", gin.H{
 			"result": Controller.LastResult,
 		})
@@ -53,7 +55,7 @@ func main() {
 		} else {
 			Controller.HandleMessage(q)
 		}
-		fmt.Println("",Controller.Expression)
+		fmt.Println("", Controller.Expression)
 		ctx.HTML(http.StatusOK, "index.html", gin.H{
 			"result": Controller.LastResult,
 		})
