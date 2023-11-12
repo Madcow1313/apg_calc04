@@ -13,7 +13,7 @@ import (
 )
 
 type Drawer struct {
-	PostfixExpression      string
+	Expression             string
 	CurrentDir             string
 	XMin, XMax, YMin, YMax float64
 }
@@ -21,7 +21,7 @@ type Drawer struct {
 func (d *Drawer) initPlotterFunction(x float64) float64 {
 	var m Model.Model
 	X := strconv.FormatFloat(x, 'f', -1, 64)
-	m.PostfixExpression = strings.ReplaceAll(d.PostfixExpression, "X", X)
+	m.Expression = strings.ReplaceAll(d.Expression, "X", X)
 	m.StartComputeRPN()
 	if m.Result == math.Inf(1) || m.Result == math.Inf(-1) || math.IsNaN(m.Result) {
 		return math.NaN()

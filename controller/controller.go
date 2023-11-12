@@ -2,12 +2,14 @@ package controller
 
 import (
 	"fmt"
+	"net/http"
 	"os"
 	"strconv"
 	"strings"
 	Drawer "webCalc/drawer"
 	Model "webCalc/model"
-	Stack "webCalc/stack"
+
+	"github.com/gin-gonic/gin"
 )
 
 type Controller struct {
@@ -16,11 +18,63 @@ type Controller struct {
 	postfixExpression,
 	LastResult,
 	currentDir string
-	priorities             map[string]int
 	history                map[int64]string
 	currentHistoryPosition int64
 	logFile                *os.File
 	XMax, XMin             float64
+}
+
+func (Controller *Controller) GET(router *gin.Engine) {
+	router.GET("/", func(ctx *gin.Context) {
+		if Controller.LastResult == "error" {
+			Controller.LastResult = ""
+		}
+		Controller.Expression = Controller.LastResult
+		fmt.Println(Controller.LastResult)
+		ctx.HTML(http.StatusOK, "index.html", gin.H{
+			"result": Controller.LastResult,
+		})
+	})
+	router.GET("/help.html", func(ctx *gin.Context) {
+		ctx.HTML(http.StatusOK, "help.html", nil)
+	})
+	router.GET("/graph_window.html", func(ctx *gin.Context) {
+		_, err := Controller.InvokeGraphic(Controller.XMin, Controller.XMax, Controller.XMin, Controller.XMax)
+		if err == nil {
+			ctx.HTML(http.StatusOK, "graph_window.html", nil)
+		}
+	})
+}
+
+func (Controller *Controller) POST(router *gin.Engine) {
+	router.POST("/", func(ctx *gin.Context) {
+		q, _ := ctx.GetQuery("body")
+		q = strings.Trim(q, "'")
+		if q == " plus " {
+			q = " + "
+		} else if q == " divide " {
+			q = " / "
+		}
+		if strings.HasPrefix(q, "x= ") {
+			q = strings.TrimPrefix(q, "x= ")
+			Controller.Expression = strings.ReplaceAll(Controller.Expression, "X", q)
+		} else if strings.HasPrefix(q, "xy_min= ") {
+			q = strings.TrimPrefix(q, "xy_min= ")
+			Controller.XMin, _ = strconv.ParseFloat(q, 64)
+		} else if strings.HasPrefix(q, "xy_max= ") {
+			q = strings.TrimPrefix(q, "xy_max= ")
+			Controller.XMax, _ = strconv.ParseFloat(q, 64)
+		} else if q == "clear" {
+			Controller.Expression = ""
+		} else if q == "=" {
+			Controller.InvokeModel()
+		} else {
+			Controller.HandleMessage(q)
+		}
+		ctx.HTML(http.StatusOK, "index.html", gin.H{
+			"result": Controller.LastResult,
+		})
+	})
 }
 
 func (c *Controller) HandleMessage(message string) {
@@ -105,13 +159,21 @@ func openLogFile(currentDir string) (*os.File, error) {
 }
 
 func (c *Controller) Init() {
-	c.fillPriorities()
 	logFile, err := openLogFile(c.currentDir)
 	if err == nil {
 		c.logFile = logFile
 		c.history = make(map[int64]string)
 		c.readHistory()
 	}
+	router := gin.Default()
+
+	router.LoadHTMLFiles("index.html", "help.html", "graph_window.html")
+	router.StaticFile("./jsScript/index.js", "jsScript/index.js")
+	router.StaticFile("./test.png", "test.png")
+
+	c.GET(router)
+	c.POST(router)
+	router.Run()
 }
 
 func (c *Controller) readHistory() {
@@ -143,8 +205,8 @@ func (c *Controller) writeLog(expression string) {
 
 func (c *Controller) InvokeModel() {
 	var m Model.Model
-	c.postfixExpression, _ = c.infixToPostfix(strings.Fields(c.Expression))
-	m.PostfixExpression = c.postfixExpression
+	m.Expression = c.Expression
+	m.FillPriorities()
 	if !m.StartComputeRPN() {
 		c.LastResult = "error"
 	} else {
@@ -157,83 +219,9 @@ func (c *Controller) InvokeGraphic(xMin, xMax, yMin, yMax float64) (string, erro
 	var d Drawer.Drawer
 
 	d.XMax, d.XMin, d.YMin, d.YMax = xMax, xMin, yMin, yMax
-	d.PostfixExpression, _ = c.infixToPostfix(strings.Fields(c.Expression))
+	d.Expression = c.Expression
 	d.CurrentDir = c.currentDir
 	fileName, err := d.Draw()
 
 	return fileName, err
-}
-
-func (c *Controller) fillPriorities() {
-	c.priorities = make(map[string]int)
-	c.priorities["sin"] = 5
-	c.priorities["cos"] = 5
-	c.priorities["tan"] = 5
-	c.priorities["asin"] = 5
-	c.priorities["acos"] = 5
-	c.priorities["atan"] = 5
-	c.priorities["ln"] = 5
-	c.priorities["log"] = 5
-
-	c.priorities["^"] = 4
-	c.priorities["sqrt"] = 4
-	c.priorities["unary_minus"] = 4
-	c.priorities["unary_plus"] = 4
-
-	c.priorities["*"] = 3
-	c.priorities["/"] = 3
-
-	c.priorities["+"] = 2
-	c.priorities["-"] = 2
-
-	c.priorities["mod"] = 1
-}
-
-func (c *Controller) getPriority(s string) int {
-	result, exist := c.priorities[s]
-	if !exist {
-		return -1
-	}
-	return result
-}
-
-func (c *Controller) infixToPostfix(s []string) (string, error) {
-	var postfixString string
-	var stack Stack.Stack[string]
-	for _, value := range s {
-		prior := c.getPriority(value)
-		if prior < 0 && value != "(" && value != ")" {
-			postfixString = postfixString + " " + value
-		} else if value == "(" {
-			stack.Push(value)
-		} else if value == ")" {
-			for {
-				str, _ := stack.Top()
-				if stack.IsEmpty() || str == "(" {
-					break
-				}
-				postfixString = postfixString + " " + str
-				stack.Pop()
-			}
-			stack.Pop()
-		} else {
-			for {
-				str, _ := stack.Top()
-				if stack.IsEmpty() || !(prior <= c.getPriority(str)) {
-					break
-				}
-				postfixString = postfixString + " " + str
-				stack.Pop()
-			}
-			stack.Push(value)
-		}
-	}
-	for {
-		if stack.IsEmpty() {
-			break
-		}
-		str, _ := stack.Pop()
-		postfixString = postfixString + " " + str
-	}
-	return postfixString, nil
 }

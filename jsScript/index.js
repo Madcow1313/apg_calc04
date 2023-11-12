@@ -55,11 +55,11 @@ for (var i = 0; i < buttons.length; i++) {
 	buttons[i].addEventListener('click', clickFunction)
 }
 
-xyMin.addEventListener('focus', () => {
+xyMin.addEventListener('focusout', () => {
 	sendRequest('xy_min= ' + xyMin.value)
 })
 
-xyMax.addEventListener('focus', () => {
+xyMax.addEventListener('focusout', () => {
 	sendRequest('xy_max= ' + xyMax.value)
 })
 

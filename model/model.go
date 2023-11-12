@@ -9,8 +9,9 @@ import (
 )
 
 type Model struct {
-	PostfixExpression string
-	Result            float64
+	Expression string
+	Result     float64
+	priorities map[string]int
 }
 
 func cycleComputing(f func(float64, float64) float64, stack *stack.Stack[float64]) float64 {
@@ -84,10 +85,89 @@ func getNumber(n string) (float64, error) {
 	return number, nil
 }
 
+func (m *Model) FillPriorities() {
+	m.priorities = make(map[string]int)
+	m.priorities["sin"] = 5
+	m.priorities["cos"] = 5
+	m.priorities["tan"] = 5
+	m.priorities["asin"] = 5
+	m.priorities["acos"] = 5
+	m.priorities["atan"] = 5
+	m.priorities["ln"] = 5
+	m.priorities["log"] = 5
+
+	m.priorities["^"] = 4
+	m.priorities["sqrt"] = 4
+	m.priorities["unary_minus"] = 4
+	m.priorities["unary_plus"] = 4
+
+	m.priorities["*"] = 3
+	m.priorities["/"] = 3
+
+	m.priorities["+"] = 2
+	m.priorities["-"] = 2
+
+	m.priorities["mod"] = 1
+}
+
+func (m *Model) getPriority(s string) int {
+	result, exist := m.priorities[s]
+	if !exist {
+		return -1
+	}
+	return result
+}
+
+func (m *Model) infixToPostfix(s []string) (string, error) {
+	var postfixString string
+	var stack stack.Stack[string]
+	for _, value := range s {
+		prior := m.getPriority(value)
+		if prior < 0 && value != "(" && value != ")" {
+			postfixString = postfixString + " " + value
+		} else if value == "(" {
+			stack.Push(value)
+		} else if value == ")" {
+			for {
+				str, _ := stack.Top()
+				if stack.IsEmpty() || str == "(" {
+					break
+				}
+				postfixString = postfixString + " " + str
+				stack.Pop()
+			}
+			stack.Pop()
+		} else {
+			for {
+				str, _ := stack.Top()
+				if stack.IsEmpty() || !(prior <= m.getPriority(str)) {
+					break
+				}
+				postfixString = postfixString + " " + str
+				stack.Pop()
+			}
+			stack.Push(value)
+		}
+	}
+	for {
+		if stack.IsEmpty() {
+			break
+		}
+		str, _ := stack.Pop()
+		postfixString = postfixString + " " + str
+	}
+	return postfixString, nil
+}
+
 func (m *Model) StartComputeRPN() bool {
 	var Result float64
 	var stack stack.Stack[float64]
-	input := strings.Fields(m.PostfixExpression)
+	f := strings.Fields(m.Expression)
+	postfixExpression, err := m.infixToPostfix(f)
+	if err != nil {
+		return false
+	}
+	input := strings.Fields(postfixExpression)
 	for _, value := range input {
 		n, err := getNumber(value)
 		if err != nil {
