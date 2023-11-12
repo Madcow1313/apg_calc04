@@ -24,7 +24,6 @@ type Controller struct {
 }
 
 func (c *Controller) HandleMessage(message string) {
-	fmt.Println("in handle", message)
 	switch message {
 	case "button_next":
 		c.HandleHistory("next")
