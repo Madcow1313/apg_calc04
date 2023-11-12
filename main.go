@@ -19,11 +19,12 @@ func main() {
 	router.StaticFile("./jsScript/index.js", "jsScript/index.js")
 	router.StaticFile("./test.png", "test.png")
 	router.GET("/", func(ctx *gin.Context) {
-		Controller.Expression = ""
-		Controller.LastResult = ""
+		Controller.Expression = Controller.LastResult
+		// Controller.LastResult = ""
 		ctx.HTML(http.StatusOK, "index.html", gin.H{
 			"result": Controller.LastResult,
 		})
+		fmt.Println("in get", Controller.LastResult)
 	})
 	router.GET("/help.html", func(ctx *gin.Context) {
 		ctx.HTML(http.StatusOK, "help.html", nil)
@@ -38,6 +39,14 @@ func main() {
 	router.POST("/", func(ctx *gin.Context) {
 		q, _ := ctx.GetQuery("body")
 		q = strings.Trim(q, "'")
+		// if len(Controller.Expression) == 0 {
+		// 	Controller.Expression += Controller.LastResult
+		// }
+		if q == " plus " {
+			q = " + "
+		} else if q == " divide " {
+			q = " / "
+		}
 		if strings.HasPrefix(q, "x= ") {
 			q = strings.TrimPrefix(q, "x= ")
 			Controller.Expression = strings.ReplaceAll(Controller.Expression, "X", q)
@@ -51,11 +60,9 @@ func main() {
 			Controller.Expression = ""
 		} else if q == "=" {
 			Controller.InvokeModel()
-			fmt.Println(Controller.LastResult)
 		} else {
 			Controller.HandleMessage(q)
 		}
-		fmt.Println("", Controller.Expression)
 		ctx.HTML(http.StatusOK, "index.html", gin.H{
 			"result": Controller.LastResult,
 		})

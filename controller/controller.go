@@ -24,53 +24,68 @@ type Controller struct {
 }
 
 func (c *Controller) HandleMessage(message string) {
-	if message == " unary_minus " {
-		c.Expression += message
-		c.ExpressionBack += "-"
-	} else if message == " unary_plus " {
-		c.Expression += message
-		c.ExpressionBack += "+"
-	} else if message == " sin " || message == " cos " || message == " tan " ||
-		message == " asin " || message == " acos " || message == " atan " ||
-		message == " ln " || message == " log " || message == " sqrt " || message == " mod " {
-		c.Expression += message
-		c.ExpressionBack += strings.TrimSuffix(message, " ") + "( "
-	} else if message == "clear" {
-		c.Expression = ""
-		c.ExpressionBack = ""
-	} else {
-		c.Expression += message
-		c.ExpressionBack += message
+	fmt.Println("in handle", message)
+	switch message {
+	case "button_next":
+		c.HandleHistory("next")
+		break
+	case "button_last":
+		c.HandleHistory("last")
+		break
+	case "button_prev":
+		c.HandleHistory("prev")
+		break
+	case "button_history_clear":
+		c.HandleHistory("history_clear")
+		break
+	default:
+		if message == " unary_minus " {
+			c.Expression += message
+			c.ExpressionBack += "-"
+		} else if message == " unary_plus " {
+			c.Expression += message
+			c.ExpressionBack += "+"
+		} else if message == " sin " || message == " cos " || message == " tan " ||
+			message == " asin " || message == " acos " || message == " atan " ||
+			message == " ln " || message == " log " || message == " sqrt " || message == " mod " {
+			c.Expression += message
+			c.ExpressionBack += strings.TrimSuffix(message, " ") + "( "
+		} else if message == "clear" {
+			c.Expression = ""
+			c.ExpressionBack = ""
+		} else {
+			c.Expression += message
+			c.ExpressionBack += message
+		}
 	}
 }
 
 func (c *Controller) HandleHistory(message string) {
+	history := c.history
+	lh := int64(len(history))
+	c.ExpressionBack = strings.ReplaceAll(history[lh], "unary_plus", "+")
+	c.ExpressionBack = strings.ReplaceAll(history[lh], "unary_minus", "-")
 	if message == "last" {
-		history := c.history
-		lh := int64(len(history))
 		if lh != 0 {
 			c.currentHistoryPosition = lh
-			c.ExpressionBack = strings.ReplaceAll(history[lh], "unary_plus", "+")
-			c.ExpressionBack = strings.ReplaceAll(history[lh], "unary_minus", "-")
 			c.Expression = history[lh]
+			c.LastResult = history[lh]
 		}
 	} else if message == "prev" {
 		history := c.history
 		lh := int64(len(history))
 		if lh != 0 && c.currentHistoryPosition != 0 {
 			c.currentHistoryPosition -= 1
-			c.ExpressionBack = strings.ReplaceAll(history[c.currentHistoryPosition], "unary_plus", "+")
-			c.ExpressionBack = strings.ReplaceAll(history[c.currentHistoryPosition], "unary_minus", "-")
 			c.Expression = history[c.currentHistoryPosition]
+			c.LastResult = history[c.currentHistoryPosition]
 		}
 	} else if message == "next" {
 		history := c.history
 		lh := int64(len(history))
 		if lh != 0 && c.currentHistoryPosition != int64(len(history)) {
 			c.currentHistoryPosition += 1
-			c.ExpressionBack = strings.ReplaceAll(history[c.currentHistoryPosition], "unary_plus", "+")
-			c.ExpressionBack = strings.ReplaceAll(history[c.currentHistoryPosition], "unary_minus", "-")
 			c.Expression = history[c.currentHistoryPosition]
+			c.LastResult = history[c.currentHistoryPosition]
 		}
 	} else if message == "history_clear" {
 		c.logFile.Truncate(0)
