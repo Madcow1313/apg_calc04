@@ -21,7 +21,7 @@ type Controller struct {
 	history                map[int64]string
 	currentHistoryPosition int64
 	logFile                *os.File
-	XMax, XMin             float64
+	XMax, XMin, YMin, YMax float64
 }
 
 func (Controller *Controller) GET(router *gin.Engine) {
@@ -39,7 +39,7 @@ func (Controller *Controller) GET(router *gin.Engine) {
 		ctx.HTML(http.StatusOK, "help.html", nil)
 	})
 	router.GET("/graph_window.html", func(ctx *gin.Context) {
-		_, err := Controller.InvokeGraphic(Controller.XMin, Controller.XMax, Controller.XMin, Controller.XMax)
+		_, err := Controller.InvokeGraphic(Controller.XMin, Controller.XMax, Controller.YMin, Controller.YMax)
 		if err == nil {
 			ctx.HTML(http.StatusOK, "graph_window.html", nil)
 		}
@@ -58,12 +58,18 @@ func (Controller *Controller) POST(router *gin.Engine) {
 		if strings.HasPrefix(q, "x= ") {
 			q = strings.TrimPrefix(q, "x= ")
 			Controller.Expression = strings.ReplaceAll(Controller.Expression, "X", q)
-		} else if strings.HasPrefix(q, "xy_min= ") {
-			q = strings.TrimPrefix(q, "xy_min= ")
+		} else if strings.HasPrefix(q, "x_min= ") {
+			q = strings.TrimPrefix(q, "x_min= ")
 			Controller.XMin, _ = strconv.ParseFloat(q, 64)
-		} else if strings.HasPrefix(q, "xy_max= ") {
-			q = strings.TrimPrefix(q, "xy_max= ")
+		} else if strings.HasPrefix(q, "x_max= ") {
+			q = strings.TrimPrefix(q, "x_max= ")
 			Controller.XMax, _ = strconv.ParseFloat(q, 64)
+		} else if strings.HasPrefix(q, "y_min= ") {
+			q = strings.TrimPrefix(q, "y_min= ")
+			Controller.YMin, _ = strconv.ParseFloat(q, 64)
+		} else if strings.HasPrefix(q, "y_max= ") {
+			q = strings.TrimPrefix(q, "y_max= ")
+			Controller.YMax, _ = strconv.ParseFloat(q, 64)
 		} else if q == "clear" {
 			Controller.Expression = ""
 		} else if q == "=" {
@@ -101,6 +107,7 @@ func (c *Controller) HandleMessage(message string) {
 		} else if message == " sin " || message == " cos " || message == " tan " ||
 			message == " asin " || message == " acos " || message == " atan " ||
 			message == " ln " || message == " log " || message == " sqrt " || message == " mod " {
+			fmt.Println(message)
 			c.Expression += message
 			c.ExpressionBack += strings.TrimSuffix(message, " ") + "( "
 		} else if message == "clear" {

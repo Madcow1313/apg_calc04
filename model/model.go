@@ -1,6 +1,7 @@
 package Model
 
 import (
+	"fmt"
 	"math"
 	"strconv"
 	"strings"
@@ -122,7 +123,9 @@ func (m *Model) infixToPostfix(s []string) (string, error) {
 	var postfixString string
 	var stack stack.Stack[string]
 	for _, value := range s {
+		value = strings.TrimSpace(value)
 		prior := m.getPriority(value)
+		fmt.Println(prior, value)
 		if prior < 0 && value != "(" && value != ")" {
 			postfixString = postfixString + " " + value
 		} else if value == "(" {
@@ -182,5 +185,6 @@ func (m *Model) StartComputeRPN() bool {
 		return false
 	}
 	m.Result = Result
+	fmt.Println("result is ", Result)
 	return true
 }

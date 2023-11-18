@@ -20,6 +20,7 @@ type Drawer struct {
 
 func (d *Drawer) initPlotterFunction(x float64) float64 {
 	var m Model.Model
+	m.FillPriorities()
 	X := strconv.FormatFloat(x, 'f', -1, 64)
 	m.Expression = strings.ReplaceAll(d.Expression, "X", X)
 	m.StartComputeRPN()
@@ -31,7 +32,7 @@ func (d *Drawer) initPlotterFunction(x float64) float64 {
 
 func (d *Drawer) Draw() (string, error) {
 	var xys plotter.XYs
-	fmt.Println(d.XMax, d.XMin)
+	fmt.Println(d.XMax, d.XMin, d.YMax, d.YMin)
 	for x := d.XMin; x <= d.XMax; x += 0.1 {
 		y := d.initPlotterFunction(x)
 		if math.IsNaN(y) || y > d.YMax || y < d.YMin {

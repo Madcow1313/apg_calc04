@@ -1,8 +1,10 @@
 const buttons = document.getElementsByClassName('simple_buttons')
 const mainEntry = document.getElementById('inputField')
 const xInput= document.getElementById('input_x_value')
-const xyMin = document.getElementById('input_min')
-const xyMax = document.getElementById('input_max')
+const xMin = document.getElementById('input_min_x')
+const xMax = document.getElementById('input_max_x')
+const yMin = document.getElementById('input_min_y')
+const yMax = document.getElementById('input_max_y')
 
 let start = true
 
@@ -55,12 +57,20 @@ for (var i = 0; i < buttons.length; i++) {
 	buttons[i].addEventListener('click', clickFunction)
 }
 
-xyMin.addEventListener('focusout', () => {
-	sendRequest('xy_min= ' + xyMin.value)
+xMin.addEventListener('focusout', () => {
+	sendRequest('x_min= ' + xMin.value)
 })
 
-xyMax.addEventListener('focusout', () => {
-	sendRequest('xy_max= ' + xyMax.value)
+xMax.addEventListener('focusout', () => {
+	sendRequest('x_max= ' + xMax.value)
+})
+
+yMin.addEventListener('focusout', () => {
+	sendRequest('y_min= ' + yMin.value)
+})
+
+yMax.addEventListener('focusout', () => {
+	sendRequest('y_max= ' + yMax.value)
 })
 
 

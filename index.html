@@ -127,34 +127,42 @@
     </p>
     <br></br>
     <p>
-        <label><br>x,y(min, max)</label>
-        <button id="button7" class="simple_buttons" value="7">7</button>
+        <label><br>x,y min</label>
+        <button id="button7" class="simple_buttons" value="7" style="margin-left: 2px;">7</button>
         <button id="button8" class="simple_buttons" value="8">8</button>
 		<button id="button9" class="simple_buttons" value="9">9</button>
+        <label><br>x,y max</label>
     </p>
     <br></br>
     <p>
-        <input id="input_min" type="text" placeholder="0" class="input_xy"></input>
-        <button id="button_clear" class="simple_buttons" value="clear">AC</button>
+        <input id="input_min_x" type="text" placeholder="0" class="input_xy"></input>
+        <button id="button_clear" class="simple_buttons" value="clear" style="margin-left: 3.5px;">AC</button>
 		<button id="button0" class="simple_buttons" value="0">0</button>
         <button id="button_equals" class="simple_buttons" value="=">=</button>
-		<button id="button_help" class="simple_buttons" value="help">help</button>
+        <input id="input_max_x" type="text" placeholder="0" class="input_xy"></input>
     </p>
     <br></br>
     <p>
-        <input id="input_max" type="text" placeholder="0" class="input_xy"></input>
+        <input id="input_min_y" type="text" placeholder="0" class="input_xy"></input>
         <label style="font-size: 2em; width: 3.1em; margin-top: 0.1em; height: 1.2em;">X=</label><input id="input_x_value" type="text" placeholder="0" value="0" class="input_xy"></input>
-        <button id="button_dot" class="simple_buttons" value=".">.</button>
-		<button id="button_graph" class="simple_buttons" value="graph">graph</button>
+        <button id="button_dot" class="simple_buttons" value="." style="margin-left: 3.5px;">.</button>
+        <input id="input_max_y" type="text" placeholder="0" class="input_xy"></input>
     </p>
     <br></br>
     <p>
         <label style="max-width: 5.9em;"><br>history</label>
-        <button id="button_last" class="simple_buttons" value="last">last</button>
+        <button id="button_last" class="simple_buttons" value="last" style="margin-left: 3.5px;">last</button>
         <button id="button_prev" class="simple_buttons" value="prev">prev</button>
 		<button id="button_next" class="simple_buttons" value="next">next</button>
-		<button id="button_history_clear" class="simple_buttons" value="history_clear">clear</button>
     </p>
+    <br></br>
+    <p>
+        <button style="visibility: hidden; color: transparent; margin-left: -1.5px" class="simple_buttons"></button>
+        <button id="button_help" class="simple_buttons" value="help" style="margin-left: 3.5px;">help</button>
+        <button id="button_graph" class="simple_buttons" value="graph">graph</button>
+        <button id="button_history_clear" class="simple_buttons" value="history_clear">clear</button>
+    </p>
+
 <script src="./jsScript/index.js"></script>
 <!-- <script src="./jsScript/renderer.js"></script> -->
 </body>
